@@ -11,7 +11,8 @@ public class Launcher {
         if (param == null) return;
 
         ObjectFactory objectManager = new ObjectFactory(param);
-        new CoverChecker(objectManager.getCoverageReportParser(),
+        new CoverChecker(
+                objectManager.getCoverageReportParser(),
                 objectManager.getDiffReader(),
                 objectManager.getNewCoverageParser(),
                 objectManager.getReporter()).check(param);

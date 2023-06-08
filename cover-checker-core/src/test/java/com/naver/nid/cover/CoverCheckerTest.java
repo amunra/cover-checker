@@ -12,8 +12,8 @@ import com.naver.nid.cover.parser.diff.model.Diff;
 import com.naver.nid.cover.parser.diff.model.DiffSection;
 import com.naver.nid.cover.parser.diff.model.Line;
 import com.naver.nid.cover.parser.diff.model.ModifyType;
-import com.naver.nid.cover.reporter.Reporter;
 import com.naver.nid.cover.reporter.ConsoleReporter;
+import com.naver.nid.cover.reporter.Reporter;
 import com.naver.nid.cover.util.Parameter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,88 +35,88 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class CoverCheckerTest {
 
-	private Reporter reporter = new ConsoleReporter();
+    private final Reporter reporter = new ConsoleReporter();
 
-	@Mock
-	private DiffParser diffParser;
+    @Mock
+    private DiffParser diffParser;
 
-	@Mock
-	private CoverageReportParser coverageReportParser;
+    @Mock
+    private CoverageReportParser coverageReportParser;
 
-	@Mock
-	private NewCoverageChecker checker;
+    @Mock
+    private NewCoverageChecker checker;
 
-	@Test
-	public void testCheck() {
-		CoverChecker coverChecker = Mockito.spy(new CoverChecker(coverageReportParser, diffParser, checker, reporter));
+    @Test
+    public void testCheck() {
+        CoverChecker coverChecker = Mockito.spy(new CoverChecker(Arrays.asList(coverageReportParser, coverageReportParser), diffParser, checker, reporter));
 
-		List<Line> lines = Arrays.asList(
-				Line.builder().lineNumber(1).type(ModifyType.ADD).build()
-				, Line.builder().lineNumber(2).type(ModifyType.ADD).build());
+        List<Line> lines = Arrays.asList(
+                Line.builder().lineNumber(1).type(ModifyType.ADD).build()
+                , Line.builder().lineNumber(2).type(ModifyType.ADD).build());
 
-		List<DiffSection> diffSectionList = Collections.singletonList(DiffSection.builder().lineList(lines).build());
-		Stream<Diff> diffStream = Stream.of(Diff.builder().fileName(Paths.get("test.java")).diffSectionList(diffSectionList).build(),
-			Diff.builder().fileName(Paths.get("test2.java")).diffSectionList(diffSectionList).build());
+        List<DiffSection> diffSectionList = Collections.singletonList(DiffSection.builder().lineList(lines).build());
+        Stream<Diff> diffStream = Stream.of(Diff.builder().fileName(Paths.get("test.java")).diffSectionList(diffSectionList).build(),
+                Diff.builder().fileName(Paths.get("test2.java")).diffSectionList(diffSectionList).build());
 
 
-		LineCoverageReport lineCoverageReport = new LineCoverageReport();
-		lineCoverageReport.setStatus(CoverageStatus.COVERED);
-		lineCoverageReport.setLineNum(1);
+        LineCoverageReport lineCoverageReport = new LineCoverageReport();
+        lineCoverageReport.setStatus(CoverageStatus.COVERED);
+        lineCoverageReport.setLineNum(1);
 
-		LineCoverageReport lineCoverageReport2 = new LineCoverageReport();
-		lineCoverageReport2.setStatus(CoverageStatus.UNCOVERED);
-		lineCoverageReport2.setLineNum(2);
+        LineCoverageReport lineCoverageReport2 = new LineCoverageReport();
+        lineCoverageReport2.setStatus(CoverageStatus.UNCOVERED);
+        lineCoverageReport2.setLineNum(2);
 
-		FileCoverageReport fileCoverageReport = new FileCoverageReport();
-		fileCoverageReport.setType("java");
-		fileCoverageReport.setFileName(Paths.get("test.java"));
-		fileCoverageReport.setLineCoverageReportList(Arrays.asList(lineCoverageReport, lineCoverageReport2));
-		FileCoverageReport fileCoverageReport2 = new FileCoverageReport();
-		fileCoverageReport.setType("java");
-		fileCoverageReport.setFileName(Paths.get("test2.java"));
-		fileCoverageReport.setLineCoverageReportList(Arrays.asList(lineCoverageReport, lineCoverageReport2));
-		List<FileCoverageReport> coverageModule1 = Collections.singletonList(fileCoverageReport);
-		List<FileCoverageReport> coverageModule2 = Collections.singletonList(fileCoverageReport2);
+        FileCoverageReport fileCoverageReport = new FileCoverageReport();
+        fileCoverageReport.setType("java");
+        fileCoverageReport.setFileName(Paths.get("test.java"));
+        fileCoverageReport.setLineCoverageReportList(Arrays.asList(lineCoverageReport, lineCoverageReport2));
+        FileCoverageReport fileCoverageReport2 = new FileCoverageReport();
+        fileCoverageReport.setType("java");
+        fileCoverageReport.setFileName(Paths.get("test2.java"));
+        fileCoverageReport.setLineCoverageReportList(Arrays.asList(lineCoverageReport, lineCoverageReport2));
+        List<FileCoverageReport> coverageModule1 = Collections.singletonList(fileCoverageReport);
+        List<FileCoverageReport> coverageModule2 = Collections.singletonList(fileCoverageReport2);
 
-		NewCoverageCheckReport newCoverageCheckReport = NewCoverageCheckReport.builder()
-				.threshold(50)
-				.totalNewLine(2)
-				.coveredNewLine(1)
-				.coveredFilesInfo(
-						Collections.singletonList(NewCoveredFile.builder()
-								.name(Paths.get("test.java"))
-								.addedLine(2)
-								.addedCoverLine(1)
-								.build()))
-				.build();
-		newCoverageCheckReport.setFileThreshold(30);
-		List<FileCoverageReport> coverageList = Stream.concat(coverageModule1.stream(), coverageModule2.stream()).collect(Collectors.toList());
+        NewCoverageCheckReport newCoverageCheckReport = NewCoverageCheckReport.builder()
+                .threshold(50)
+                .totalNewLine(2)
+                .coveredNewLine(1)
+                .coveredFilesInfo(
+                        Collections.singletonList(NewCoveredFile.builder()
+                                .name(Paths.get("test.java"))
+                                .addedLine(2)
+                                .addedCoverLine(1)
+                                .build()))
+                .build();
+        newCoverageCheckReport.setFileThreshold(30);
+        List<FileCoverageReport> coverageList = Stream.concat(coverageModule1.stream(), coverageModule2.stream()).collect(Collectors.toList());
 
-		List<Diff> diffList = diffStream.collect(Collectors.toList());
-		doReturn(diffList.stream()).when(diffParser).parse();
-		doReturn(coverageModule1).when(coverageReportParser).parse("test-module1");
-		doReturn(coverageModule2).when(coverageReportParser).parse("test-module2");
-		doReturn(newCoverageCheckReport).when(checker).check(coverageList, diffList, 50, 30);
+        List<Diff> diffList = diffStream.collect(Collectors.toList());
+        doReturn(diffList.stream()).when(diffParser).parse();
+        doReturn(coverageModule1).when(coverageReportParser).parse("test-module1");
+        doReturn(coverageModule2).when(coverageReportParser).parse("test-module2");
+        doReturn(newCoverageCheckReport).when(checker).check(coverageList, diffList, 50, 30);
 
-		Parameter param = Parameter.builder()
-				.coveragePath(null)
-				.diffPath("/path")
-				.coveragePath(Arrays.asList("test-module1", "test-module2"))
-				.coverageType("jacoco")
-				.githubToken("token")
-				.githubUrl("enterprise.github.com")
-				.prNumber(1)
-				.threshold(50)
-				.fileThreshold(30)
-				.repo("test/test")
-				.diffType("file")
-				.build();
+        Parameter param = Parameter.builder()
+                .coveragePath(null)
+                .diffPath("/path")
+                .coveragePath(Arrays.asList("test-module1", "test-module2"))
+                .coverageType(Arrays.asList("jacoco", "jacoco"))
+                .githubToken("token")
+                .githubUrl("enterprise.github.com")
+                .prNumber(1)
+                .threshold(50)
+                .fileThreshold(30)
+                .repo("test/test")
+                .diffType("file")
+                .build();
 
-		assertTrue(coverChecker.check(param), "Coverchecker must finish successfully");
+        assertTrue(coverChecker.check(param), "Coverchecker must finish successfully");
 
-		verify(diffParser).parse();
-		verify(coverageReportParser).parse("test-module1");
-		verify(coverageReportParser).parse("test-module2");
-		verify(checker).check(coverageList, diffList, 50, 30);
-	}
+        verify(diffParser).parse();
+        verify(coverageReportParser).parse("test-module1");
+        verify(coverageReportParser).parse("test-module2");
+        verify(checker).check(coverageList, diffList, 50, 30);
+    }
 }

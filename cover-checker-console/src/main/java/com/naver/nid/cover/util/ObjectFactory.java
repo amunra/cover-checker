@@ -15,18 +15,22 @@
  */
 package com.naver.nid.cover.util;
 
-import com.naver.nid.cover.github.parser.GithubDiffReader;
-import com.naver.nid.cover.parser.diff.DiffParser;
 import com.naver.nid.cover.checker.NewCoverageChecker;
+import com.naver.nid.cover.cobertura.CoberturaCoverageReportHandler;
 import com.naver.nid.cover.github.manager.GithubPullRequestManager;
+import com.naver.nid.cover.github.parser.GithubDiffReader;
+import com.naver.nid.cover.github.reporter.GithubPullRequestReporter;
+import com.naver.nid.cover.jacoco.JacocoReportParser;
 import com.naver.nid.cover.parser.coverage.CoverageReportParser;
 import com.naver.nid.cover.parser.coverage.XmlCoverageReportParser;
-import com.naver.nid.cover.cobertura.CoberturaCoverageReportHandler;
-import com.naver.nid.cover.jacoco.JacocoReportParser;
+import com.naver.nid.cover.parser.diff.DiffParser;
 import com.naver.nid.cover.parser.diff.FileDiffReader;
-import com.naver.nid.cover.reporter.Reporter;
 import com.naver.nid.cover.reporter.ConsoleReporter;
-import com.naver.nid.cover.github.reporter.GithubPullRequestReporter;
+import com.naver.nid.cover.reporter.Reporter;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * {@link Parameter}에 따라 내부 객체를 생성하는 Factory 객체
@@ -47,12 +51,16 @@ public class ObjectFactory {
         }
     }
 
-    public CoverageReportParser getCoverageReportParser() {
-        if ("cobertura".equals(param.getCoverageType())) {
-            return new XmlCoverageReportParser(new CoberturaCoverageReportHandler());
-        } else {
-            return new JacocoReportParser();
-        }
+    public List<CoverageReportParser> getCoverageReportParser() {
+        return IntStream.range(0, param.getCoveragePath().size())
+                .mapToObj(index -> {
+                    final String coverageType = param.getCoverageType().get(index);
+                    if ("cobertura".equals(coverageType)) {
+                        return new XmlCoverageReportParser(new CoberturaCoverageReportHandler());
+                    } else {
+                        return new JacocoReportParser();
+                    }
+                }).collect(Collectors.toList());
     }
 
     public NewCoverageChecker getNewCoverageParser() {

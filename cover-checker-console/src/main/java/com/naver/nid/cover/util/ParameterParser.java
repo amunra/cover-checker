@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ParameterParser {
 	private static final Logger logger = LoggerFactory.getLogger(ParameterParser.class);
@@ -48,17 +50,30 @@ public class ParameterParser {
 			return null;
 		}
 
+		final List<String> coveragePaths = Arrays.asList(cmd.getOptionValues("c"));
+		final String[] coverageTypesArray = cmd.getOptionValues(COVERAGE_TYPE_OPTION);
+		List<String> coverageTypes = Arrays.asList(
+				coverageTypesArray == null
+						? new String[]{ "jacoco" }
+						: coverageTypesArray);
+
+		if ((coverageTypes.size() == 1) && coveragePaths.size() > 1) {
+			// Broadcast coverage type to all coverage paths
+			final String coverageType = coverageTypes.get(0);
+			coverageTypes = coveragePaths.stream().map(path -> coverageType).collect(Collectors.toList());
+		}
+
 		Parameter param = Parameter.builder()
 				.threshold(Integer.parseInt(cmd.getOptionValue("t")))
 				.fileThreshold(getFileThreshold(cmd))
 				.githubToken(cmd.getOptionValue("g"))
 				.diffPath(cmd.getOptionValue("d"))
-				.coveragePath(Arrays.asList(cmd.getOptionValues("c")))
+				.coveragePath(coveragePaths)
 				.githubUrl(cmd.getOptionValue("u", "api.github.com"))
 				.repo(cmd.getOptionValue("r"))
 				.diffType(cmd.getOptionValue("diff-type"))
 				.prNumber(Integer.parseInt(getPrNumber(cmd)))
-				.coverageType(cmd.getOptionValue(COVERAGE_TYPE_OPTION))
+				.coverageType(coverageTypes)
 				.build();
 
 		logger.debug("execute by {}", param);

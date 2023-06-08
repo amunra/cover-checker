@@ -20,7 +20,7 @@ class ParameterParserTest {
 		assertEquals(IGitHubConstants.HOST_API, parameter.getGithubUrl());
 		assertEquals("repo", parameter.getRepo());
 		assertEquals(3, parameter.getPrNumber());
-		assertEquals("cobertura", parameter.getCoverageType());
+		assertEquals(Arrays.asList("cobertura", "cobertura"), parameter.getCoverageType());
 		assertEquals("com.naver.nid.cover.github", parameter.getDiffType());
 	}
 
