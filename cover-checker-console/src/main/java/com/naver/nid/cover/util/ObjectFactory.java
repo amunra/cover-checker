@@ -54,11 +54,14 @@ public class ObjectFactory {
     public List<CoverageReportParser> getCoverageReportParser() {
         return IntStream.range(0, param.getCoveragePath().size())
                 .mapToObj(index -> {
-                    final String coverageType = param.getCoverageType().get(index);
-                    if ("cobertura".equals(coverageType)) {
-                        return new XmlCoverageReportParser(new CoberturaCoverageReportHandler());
-                    } else {
-                        return new JacocoReportParser();
+                    final CoverageType coverageType = param.getCoverageType().get(index);
+                    switch (coverageType) {
+                        case JACOCO:
+                            return new JacocoReportParser();
+                        case COBERTURA:
+                            return new XmlCoverageReportParser(new CoberturaCoverageReportHandler());
+                        default:
+                            throw new IllegalArgumentException("Unknown coverage type: " + coverageType);
                     }
                 }).collect(Collectors.toList());
     }

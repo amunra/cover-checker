@@ -54,15 +54,16 @@ public class ParameterParser {
 		}
 
 		final List<String> coveragePaths = Arrays.asList(cmd.getOptionValues("c"));
-		final String[] coverageTypesArray = cmd.getOptionValues(COVERAGE_TYPE_OPTION);
-		List<String> coverageTypes = Arrays.asList(
-				coverageTypesArray == null
-						? new String[]{ "jacoco" }
-						: coverageTypesArray);
+		List<CoverageType> coverageTypes;
+		try {
+			coverageTypes = parseCoverageTypes(cmd.getOptionValues(COVERAGE_TYPE_OPTION));
+		} catch (IllegalArgumentException e) {
+			return fail(commandOptions, e.getMessage());
+		}
 
 		if ((coverageTypes.size() == 1) && coveragePaths.size() > 1) {
 			// If there's a single "-type" arg, broadcast it for all coverage paths.
-			final String coverageType = coverageTypes.get(0);
+			final CoverageType coverageType = coverageTypes.get(0);
 			coverageTypes = coveragePaths.stream().map(path -> coverageType).collect(Collectors.toList());
 		}
 
@@ -85,6 +86,16 @@ public class ParameterParser {
 
 		logger.debug("execute by {}", param);
 		return param;
+	}
+
+	private static List<CoverageType> parseCoverageTypes(String[] optionValues) {
+		if (optionValues == null) {
+			return Arrays.asList(CoverageType.JACOCO);
+		}
+
+		return Arrays.stream(optionValues)
+				.map(CoverageType::parse)
+				.collect(Collectors.toList());
 	}
 
 	private int getFileThreshold(CommandLine cmd) {
