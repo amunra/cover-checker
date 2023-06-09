@@ -8,11 +8,13 @@ public class Launcher {
 
     public static void main(String[] args) {
         Parameter param = new ParameterParser().getParam(args);
-        if (param == null) return;
+        if (param == null) {
+            System.exit(1);
+            return;
+        }
 
         ObjectFactory objectManager = new ObjectFactory(param);
-        new CoverChecker(
-                objectManager.getCoverageReportParser(),
+        new CoverChecker(objectManager.getCoverageReportParser(),
                 objectManager.getDiffReader(),
                 objectManager.getNewCoverageParser(),
                 objectManager.getReporter()).check(param);

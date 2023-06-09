@@ -15,18 +15,18 @@
  */
 package com.naver.nid.cover.util;
 
-import com.naver.nid.cover.checker.NewCoverageChecker;
-import com.naver.nid.cover.cobertura.CoberturaCoverageReportHandler;
-import com.naver.nid.cover.github.manager.GithubPullRequestManager;
 import com.naver.nid.cover.github.parser.GithubDiffReader;
-import com.naver.nid.cover.github.reporter.GithubPullRequestReporter;
-import com.naver.nid.cover.jacoco.JacocoReportParser;
+import com.naver.nid.cover.parser.diff.DiffParser;
+import com.naver.nid.cover.checker.NewCoverageChecker;
+import com.naver.nid.cover.github.manager.GithubPullRequestManager;
 import com.naver.nid.cover.parser.coverage.CoverageReportParser;
 import com.naver.nid.cover.parser.coverage.XmlCoverageReportParser;
-import com.naver.nid.cover.parser.diff.DiffParser;
+import com.naver.nid.cover.cobertura.CoberturaCoverageReportHandler;
+import com.naver.nid.cover.jacoco.JacocoReportParser;
 import com.naver.nid.cover.parser.diff.FileDiffReader;
-import com.naver.nid.cover.reporter.ConsoleReporter;
 import com.naver.nid.cover.reporter.Reporter;
+import com.naver.nid.cover.reporter.ConsoleReporter;
+import com.naver.nid.cover.github.reporter.GithubPullRequestReporter;
 
 import java.util.List;
 import java.util.stream.Collectors;

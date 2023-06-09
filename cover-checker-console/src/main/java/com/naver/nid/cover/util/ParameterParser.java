@@ -33,21 +33,24 @@ public class ParameterParser {
 	private static final String COVERAGE_PATH_OPTION = "cover";
 	private static final String COVERAGE_TYPE_OPTION = "type";
 
-	public Parameter getParam(String... commandArgs) {
-		Options commandOptions = executeOption();
+	private Parameter fail(Options commandOptions, String message) {
+		final PrintWriter printWriter = new PrintWriter(System.out);
+		printWriter.append(message).append('\n').append('\n');
+		final HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp(printWriter, 80, "coverchecker.jar", "", commandOptions, 0, 0, "", true);
+		printWriter.flush();
+		return null;
+	}
 
-		CommandLineParser parser = new DefaultParser();
-		HelpFormatter formatter = new HelpFormatter();
+	public Parameter getParam(String... commandArgs) {
+		final Options commandOptions = executeOption();
+		final CommandLineParser parser = new DefaultParser();
 
 		CommandLine cmd;
 		try {
 			cmd = parser.parse(commandOptions, commandArgs);
 		} catch (ParseException e) {
-			PrintWriter printWriter = new PrintWriter(System.out);
-			printWriter.append(e.getMessage()).append('\n').append('\n');
-			formatter.printHelp(printWriter, 80, "coverchecker.jar", "", commandOptions, 0, 0, "", true);
-			printWriter.flush();
-			return null;
+			return fail(commandOptions, e.getMessage());
 		}
 
 		final List<String> coveragePaths = Arrays.asList(cmd.getOptionValues("c"));
@@ -58,9 +61,13 @@ public class ParameterParser {
 						: coverageTypesArray);
 
 		if ((coverageTypes.size() == 1) && coveragePaths.size() > 1) {
-			// Broadcast coverage type to all coverage paths
+			// If there's a single "-type" arg, broadcast it for all coverage paths.
 			final String coverageType = coverageTypes.get(0);
 			coverageTypes = coveragePaths.stream().map(path -> coverageType).collect(Collectors.toList());
+		}
+
+		if (coveragePaths.size() != coverageTypes.size()) {
+			return fail(commandOptions, "Unmatched number of --cover and -type parameters");
 		}
 
 		Parameter param = Parameter.builder()
