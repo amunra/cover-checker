@@ -14,6 +14,7 @@ import com.naver.nid.cover.parser.diff.model.Line;
 import com.naver.nid.cover.parser.diff.model.ModifyType;
 import com.naver.nid.cover.reporter.ConsoleReporter;
 import com.naver.nid.cover.reporter.Reporter;
+import com.naver.nid.cover.util.CoverageType;
 import com.naver.nid.cover.util.Parameter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -102,7 +103,7 @@ class CoverCheckerTest {
                 .coveragePath(null)
                 .diffPath("/path")
                 .coveragePath(Arrays.asList("test-module1", "test-module2"))
-                .coverageType(Arrays.asList("jacoco", "jacoco"))
+                .coverageType(Arrays.asList(CoverageType.JACOCO, CoverageType.JACOCO))
                 .githubToken("token")
                 .githubUrl("enterprise.github.com")
                 .prNumber(1)

@@ -6,18 +6,21 @@ import com.naver.nid.cover.util.ParameterParser;
 
 public class Launcher {
 
-    public static void main(String[] args) {
+    public static int run(String[] args) {
         Parameter param = new ParameterParser().getParam(args);
         if (param == null) {
-            System.exit(1);
-            return;
+            return 1;
         }
-
         ObjectFactory objectManager = new ObjectFactory(param);
         new CoverChecker(objectManager.getCoverageReportParser(),
                 objectManager.getDiffReader(),
                 objectManager.getNewCoverageParser(),
                 objectManager.getReporter()).check(param);
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        System.exit(run(args));
     }
 
 }

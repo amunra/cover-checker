@@ -25,7 +25,7 @@ class ObjectFactoryTest {
     void getCoberturaCoverageReportParser() throws NoSuchFieldException, IllegalAccessException {
         CoverageReportParser cobertura = new ObjectFactory(Parameter.builder()
                 .coveragePath(Arrays.asList("dummy/path.xml"))
-                .coverageType(Arrays.asList("cobertura"))
+                .coverageType(Arrays.asList(CoverageType.COBERTURA))
                 .build()).getCoverageReportParser().get(0);
         Field handler = XmlCoverageReportParser.class.getDeclaredField("handler");
         handler.setAccessible(true);
@@ -36,7 +36,7 @@ class ObjectFactoryTest {
     void getJacocoCoverageReportParser() {
         CoverageReportParser jacoco = new ObjectFactory(Parameter.builder()
                 .coveragePath(Arrays.asList("dummy/path.xml"))
-                .coverageType(Arrays.asList("jacoco"))
+                .coverageType(Arrays.asList(CoverageType.JACOCO))
                 .build()).getCoverageReportParser().get(0);
         assertEquals(JacocoReportParser.class, jacoco.getClass());
     }

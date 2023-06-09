@@ -48,14 +48,7 @@ public final class XmlCoverageReportParser implements CoverageReportParser {
 
 			log.debug("parse {}", reportFile.getName());
 			SAXParser saxParser = saxParserFactory.newSAXParser();
-			try {
-				System.err.printf("parse :: (A) reportFile: %s, threadId: %d, this: %s, handler: %s\n", reportFile, Thread.currentThread().getId(), this, handler);
-				saxParser.parse(reportFile, handler);
-				System.err.printf("parse :: (B)\n");
-			} catch (NullPointerException npe) {
-				System.err.println("Got it!");
-				throw npe;
-			}
+			saxParser.parse(reportFile, handler);
 			XMLInputFactory factory = XMLInputFactory.newInstance();
 			log.debug("FACTORY: {}", factory);
 
